@@ -20,7 +20,7 @@ typedef struct FUNC{
 int age;
 float salary;
 
-
+printf("(são aceitos apenas números. Não colocar caracteres.)\n");
 printf("Digite sua idade: \n");
 scanf("%d", &age);
 
