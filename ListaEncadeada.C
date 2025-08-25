@@ -1,11 +1,14 @@
 // Neste código, os dados dos funcionários são guardados em uma estrutura de Lista Encadeada.
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 int ID = 1;
 int amount = 0;
 
 typedef struct FUNC{
     
+    char* name;
     int ID;
     int age;
     float salary;
@@ -13,14 +16,41 @@ typedef struct FUNC{
     
 }functionary;
 
-
+char *read_name(){
+    char* name = NULL;
+    size_t how_many_letters = 0;
+    ssize_t count;
+    int i = 0;
+    
+    do {
+        
+    getline(&name,&how_many_letters, stdin);
+    name[strcspn(name, "\n")] = '\0';
+    
+    if(!(strlen(name)) && (i > 0)){
+        printf("Digite algo. \n");
+    }
+    
+    i++;
+    
+    }while(!(strlen(name)));
+    
+    
+    return name;
+    
+}
 
  functionary* newFunctionary() {
-
+char* name;
 int age;
 float salary;
+int how_many_letters;
 
-printf("(são aceitos apenas números. Não colocar caracteres.)\n");
+printf("(Para idade e salário, são aceitos apenas números. Não colocar caracteres.)\n");
+
+printf("Digite seu nome: \n");
+name = read_name();
+
 printf("Digite sua idade: \n");
 scanf("%d", &age);
 
@@ -31,6 +61,7 @@ scanf("%f", &salary);
 functionary* novo = (functionary *) malloc (sizeof(functionary));
 
 novo->ID = ID;
+novo->name = name;
 novo-> age = age;
 novo->salary = salary;
 novo->nextFunc = NULL;
@@ -90,7 +121,7 @@ functionary* tmp = LIST->nextFunc;
 
 for (count = 1; count <= amount; count++){
 
-printf("%d - ID: %d, Idade: %d, Salário: %.3f \n", count, tmp->ID, tmp->age, tmp->salary);
+printf("%d - ID: %d, Nome: %s, Idade: %d, Salário: %.3f \n", count, tmp->ID, tmp->name, tmp->age, tmp->salary);
 
 tmp = tmp->nextFunc;
 }
@@ -207,11 +238,55 @@ void removeItemByIndex(functionary* LISTA){
     
 }
 
-void printFunctionaryById(functionary* LISTA){
+void removeItemByName(functionary* LISTA){
+    
+    if(isVoid(LISTA)){
+        printf("Lista vazia! \n");
+    } else {
+    functionary* tmp = LISTA->nextFunc;
+    functionary* tmp_storage = LISTA;
+     char* name_to_remove = NULL;
+
+    printf("Deseja eliminar da lista qual funcionário?\n");
+    printf("(lembre-se de digitar o nome exatamente como está no servidor, sem espaços.)\n");
+    name_to_remove = read_name();
+    printf("------------------------------\n");
+    
+     
+    while((tmp->nextFunc != NULL) && (strcmp(name_to_remove, tmp->name))){
+        tmp = tmp->nextFunc;
+        tmp_storage = tmp;
+    }
+    
+    if ((strcmp(name_to_remove, tmp->name))) {
+        printf("Usuário não encontrado no sistema.\n");
+    } else {
+    tmp_storage->nextFunc = tmp->nextFunc;
+    free(tmp);
+    amount--;
+    } 
+    printf("------------------------------\n");
+    }
+    
+}
+
+void printFunctionary(functionary* LISTA){
     functionary* tmp = LISTA->nextFunc;
     if (tmp == NULL) {
-        printf("Adicione funcionários antes!");
+        printf("Adicione funcionários antes!\n");
     } else {
+    int which_form;
+    
+    printf("Escolha a forma de encontrar o funcionário desejado.\n");
+    printf("1 - ID\n");
+    printf("2 - Nome\n");
+    scanf("%d", &which_form);
+    
+    
+    switch(which_form){
+        
+    case 1:
+    
     int whichId;
     
     printf("Digite o ID do funcionário: ");
@@ -222,16 +297,40 @@ void printFunctionaryById(functionary* LISTA){
     }
     
     if(tmp->ID == whichId){
-        printf("ID do funcionário: %d \n Idade: %d \n Salário: %.3f", tmp->ID, tmp->age, tmp->salary);
+        printf("Funcionário: %s, ID: %d \n Idade: %d \n Salário: %.3f", tmp->name, tmp->ID, tmp->age, tmp->salary);
         printf("------------------------------\n");
     } else {
         printf ("ID não encontrado no sistema. \n");
         printf("------------------------------\n");
     }
     
+    break;
+    
+    case 2:
+    
+    char* which_name = NULL;
+    
+    printf("Digite o nome do funcionário: \n");
+    
+    which_name = read_name();
+    
+    while((tmp->nextFunc != NULL) && (strcmp(which_name, tmp->name))){
+        tmp = tmp->nextFunc;
+    }
+    
+    if(!(strcmp(which_name, tmp->name))){
+        printf("Funcionário: %s, ID: %d, Idade: %d, Salário: %.3f \n", tmp->name, tmp->ID, tmp->age, tmp->salary);
+        printf("------------------------------\n");
+    } else {
+        printf("Usuário não encontrado no sistema.\n");
+        printf("------------------------------\n");
     }
     
     
+    
+    
+    }
+    }
 }
 
 void menu(functionary* LISTA) {
@@ -244,7 +343,7 @@ printf("------------------------------\n");
 do {
 
 printf("Que operação deseja realizar?\n");
-printf("|1 - Ver Lista de Funcionários\n|2 - adicionar funcionário no início da Lista \n|3 - adicionar funcionário no fim da Lista \n|4 - adicionar funcionário em uma posição específica da Lista \n|5 - remover funcionário do início da Lista \n|6 - remover funcionário do fim da Lista \n|7 - remover funcionário pelo ID \n|8 - remover funcionário pela posição da lista \n|9 - ver funcionário em específico \n|0 - sair do programa\n");
+printf("|1 - Ver Lista de Funcionários\n|2 - adicionar funcionário no início da Lista \n|3 - adicionar funcionário no fim da Lista \n|4 - adicionar funcionário em uma posição específica da Lista \n|5 - remover funcionário do início da Lista \n|6 - remover funcionário do fim da Lista \n|7 - remover funcionário pelo ID \n|8 - remover funcionário pela posição da lista \n|9 - remover funcionário pelo nome \n|10 - ver funcionário em específico \n|0 - sair do programa\n");
 
 scanf("%d", &opt);
 
@@ -282,7 +381,10 @@ case 8:
         removeItemByIndex(LISTA);
         break;
 case 9:
-        printFunctionaryById(LISTA);
+        removeItemByName(LISTA);
+        break;
+case 10:
+        printFunctionary(LISTA);
         break;
 default:
        printf("opção inválida, digite novamente.\n");
