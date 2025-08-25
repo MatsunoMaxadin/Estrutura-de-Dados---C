@@ -164,7 +164,7 @@ void removeItemById(functionary* LISTA){
     printf("------------------------------\n");
     
      
-    while(tmp->ID != id_to_remove){
+    while((tmp->ID != id_to_remove) && (tmp->nextFunc != NULL)){
         tmp = tmp->nextFunc;
         tmp_storage = tmp;
     }
